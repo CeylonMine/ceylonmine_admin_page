@@ -3,10 +3,10 @@ import { supabase } from '../../../utility/supabase';
 
 export async function PUT(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: any
 ) {
   try {
-    const userId = context.params.id;
+    const userId = context.params?.id;
     
     if (!userId) {
       console.error('Missing userId in params:', context.params);
