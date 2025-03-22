@@ -9,7 +9,6 @@ import UserGreeting from "../components/UserGreeting";
 import ErrorBoundary from '../components/ErrorBoundary';
 import { toast } from 'react-hot-toast';
 import { Miner } from '../types/settings';
-const [loading, setLoading] = useState(true);
 
 export default function RoyaltyPage() {
   const [miners, setMiners] = useState([]);
@@ -26,17 +25,14 @@ export default function RoyaltyPage() {
   // Fetch miners from the API
   useEffect(() => {
     const fetchMiners = async () => {
-      setLoading(true);
       try {
         const response = await fetch('/api/calculate-royalty');
         if (!response.ok) throw new Error('Failed to fetch miners');
         const data = await response.json();
         setMiners(data);
-        setLoading(false);
       } catch (error) {
         console.error('Error:', error);
         toast.error('Failed to fetch miners');
-        setLoading(false);
       }
     };
 
