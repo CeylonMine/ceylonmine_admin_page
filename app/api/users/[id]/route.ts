@@ -1,21 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '../../../utility/supabase';
 
-// Define the type for params
-type RouteParams = { params: { id: string } };
-
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, context: { params: { id: string } }) {
   try {
+    const { params } = context;
     const userId = params.id;
 
     if (!userId) {
-      console.error('Missing userId in params:', params);
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
 
     const body = await request.json();
 
-    // Validate the body contains allowed fields
     const allowedFields = ['role', 'license_status', 'active_date'];
     const updateData: Record<string, any> = {};
 
@@ -32,10 +28,6 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    console.log('Updating user with ID:', userId);
-    console.log('Update data:', updateData);
-
-    // Update the user in the database
     const { data, error } = await supabase
       .from('users')
       .update(updateData)
@@ -43,7 +35,6 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       .select();
 
     if (error) {
-      console.error('Supabase error:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -53,13 +44,13 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(data[0]);
   } catch (error) {
-    console.error('Server error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
+
 
 
 /*import { NextRequest, NextResponse } from 'next/server';
