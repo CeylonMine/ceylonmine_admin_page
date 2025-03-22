@@ -3,13 +3,13 @@ import { supabase } from '../../../utility/supabase';
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const userId = params.id;
+    const userId = context.params.id;
     
     if (!userId) {
-      console.error('Missing userId in params:', params);
+      console.error('Missing userId in params:', context.params);
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
     
