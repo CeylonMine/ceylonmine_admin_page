@@ -43,6 +43,12 @@ export default function UsersPage() {
 
   useEffect(() => {
     fetchUsers();
+
+    // Set up polling to refresh data every 3 seconds
+    const interval = setInterval(fetchUsers, 3000);
+    
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
