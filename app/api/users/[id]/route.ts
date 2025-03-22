@@ -1,58 +1,51 @@
-import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "../../../utility/supabase";
+import { NextResponse } from 'next/server';
+import { supabase } from '../../../utility/supabase';
 
-interface RouteParams {
-  params: { id: string };
-}
-
-export async function PUT(request: NextRequest, context: RouteParams) {
+export async function PUT(
+  request: Request,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
-    const userId = context.params.id; // Ensure correct access to `id`
-
-    if (!userId) {
-      return NextResponse.json({ error: "User ID is required" }, { status: 400 });
-    }
-
+    const { id } = await context.params;
     const body = await request.json();
+    const { role, license_status } = body;
 
-    const allowedFields = ["role", "license_status", "active_date"];
-    const updateData: Record<string, any> = {};
+    // First check if user exists
+    const { data: existingUser, error: checkError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('id', id)
+      .single();
 
-    for (const field of allowedFields) {
-      if (field in body) {
-        updateData[field] = body[field];
-      }
+    if (checkError || !existingUser) {
+      console.error('User not found:', checkError);
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    if (Object.keys(updateData).length === 0) {
-      return NextResponse.json(
-        { error: "No valid fields to update" },
-        { status: 400 }
-      );
-    }
+    // Update both role and license_status in a single query
+    const updateData: any = {};
+    if (role) updateData.role = role;
+    if (license_status) updateData.license_status = license_status;
 
     const { data, error } = await supabase
-      .from("users")
+      .from('users')
       .update(updateData)
-      .eq("id", userId)
-      .select();
+      .eq('id', id)
+      .select()
+      .single();
 
     if (error) {
+      console.error('Update error:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    if (!data || data.length === 0) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    return NextResponse.json(data);
 
-    return NextResponse.json(data[0]);
   } catch (error) {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Server error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+} 
 
 
 
