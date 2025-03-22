@@ -3,16 +3,16 @@ import { supabase } from '../../../utility/supabase';
 
 export async function PUT(
   request: NextRequest, 
-  { params }: { params: { id: string } }
+  context: { params?: { id?: string } }  // Fix type issue
 ) {
   try {
-    const userId = params.id;
-    
+    const userId = context.params?.id;  // Handle potential undefined case
+
     if (!userId) {
-      console.error('Missing userId in params:', params);
+      console.error('Missing userId in params:', context.params);
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
-    
+
     const body = await request.json();
 
     // Validate the body contains allowed fields
