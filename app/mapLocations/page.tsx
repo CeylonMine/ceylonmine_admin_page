@@ -55,8 +55,10 @@ export default function MapLocationsPage() {
         body: formData, // Send as FormData instead of JSON
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to save location');
+        throw new Error(data.error || 'Failed to save location');
       }
 
       // Reset form
