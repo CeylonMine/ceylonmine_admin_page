@@ -1,21 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '../../../utility/supabase';
 
-type RouteParams = {
-  params: {
-    id: string;
-  };
-};
-
 export async function PUT(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { id: string } }
 ) {
   try {
-    const userId = params.id;
+    const userId = context.params.id;
     
     if (!userId) {
-      console.error('Missing userId in params:', params);
+      console.error('Missing userId in params:', context.params);
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
     
