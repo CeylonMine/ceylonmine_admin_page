@@ -1,17 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '../../../utility/supabase';
+import { NextRequest, NextResponse } from "next/server";
+import { supabase } from "../../../utility/supabase";
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+interface RouteParams {
+  params: { id: string };
+}
+
+export async function PUT(request: NextRequest, context: RouteParams) {
   try {
-    const userId = params?.id;
+    const userId = context.params.id; // Ensure correct access to `id`
 
     if (!userId) {
-      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+      return NextResponse.json({ error: "User ID is required" }, { status: 400 });
     }
 
     const body = await request.json();
 
-    const allowedFields = ['role', 'license_status', 'active_date'];
+    const allowedFields = ["role", "license_status", "active_date"];
     const updateData: Record<string, any> = {};
 
     for (const field of allowedFields) {
@@ -22,15 +26,15 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
-        { error: 'No valid fields to update' },
+        { error: "No valid fields to update" },
         { status: 400 }
       );
     }
 
     const { data, error } = await supabase
-      .from('users')
+      .from("users")
       .update(updateData)
-      .eq('id', userId)
+      .eq("id", userId)
       .select();
 
     if (error) {
@@ -38,13 +42,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 
     if (!data || data.length === 0) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     return NextResponse.json(data[0]);
   } catch (error) {
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
