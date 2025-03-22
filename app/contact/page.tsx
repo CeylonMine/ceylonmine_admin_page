@@ -18,6 +18,7 @@ export default function ContactPage() {
 
     const fetchContacts = async () => {
         try {
+            setLoading(true);
             const response = await fetch('/api/contact');
             const data = await response.json();
             setContactData(data);

@@ -22,6 +22,7 @@ export default function ApplicationsPage() {
 
   const fetchApplications = async () => {
     try {
+      setLoading(true);
       const response = await fetch('/api/applications');
       const data = await response.json();
       setApplications(data);
@@ -34,12 +35,6 @@ export default function ApplicationsPage() {
 
   useEffect(() => {
     fetchApplications();
-
-    // Set up polling to refresh data every 3 seconds
-    const interval = setInterval(fetchApplications, 3000);
-    
-    // Cleanup interval on component unmount
-    return () => clearInterval(interval);
   }, []);
 
   if (loading) {

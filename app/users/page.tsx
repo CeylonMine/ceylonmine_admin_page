@@ -22,6 +22,7 @@ export default function UsersPage() {
   
   const fetchUsers = async () => {
     try {
+      setLoading(true);
       const response = await fetch('/api/users');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -43,12 +44,6 @@ export default function UsersPage() {
 
   useEffect(() => {
     fetchUsers();
-
-    // Set up polling to refresh data every 3 seconds
-    const interval = setInterval(fetchUsers, 3000);
-    
-    // Cleanup interval on component unmount
-    return () => clearInterval(interval);
   }, []);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
