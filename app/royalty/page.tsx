@@ -14,6 +14,7 @@ export default function RoyaltyPage() {
   const [miners, setMiners] = useState([]);
   const [selectedMiner, setSelectedMiner] = useState<Miner | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   const [miningStats, setMiningStats] = useState({
     explosiveQuantity: 0,
     blastedVolume: 0,
@@ -26,13 +27,16 @@ export default function RoyaltyPage() {
   useEffect(() => {
     const fetchMiners = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch('/api/calculate-royalty');
         if (!response.ok) throw new Error('Failed to fetch miners');
         const data = await response.json();
         setMiners(data);
+        setIsLoading(false);
       } catch (error) {
         console.error('Error:', error);
         toast.error('Failed to fetch miners');
+        setIsLoading(false);
       }
     };
 
@@ -126,30 +130,37 @@ export default function RoyaltyPage() {
           {/* Miner Search Section */}
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4 text-gray-900">Select Miner</h2>
-            <div className="relative">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search miner by name..."
-                className="w-full px-4 py-2 rounded-md bg-gray-800 border border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-white"
-              />
-              
-              {/* Dropdown for search results */}
-              {searchTerm && filteredMiners.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg max-h-60 overflow-auto">
-                  {filteredMiners.map((miner: Miner) => (
-                    <div
-                      key={miner.id}
-                      onClick={() => handleMinerSelect(miner)}
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-800"
-                    >
-                      {miner.first_name + ' ' + miner.last_name}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                <span className="ml-3 text-gray-600">Loading miners...</span>
+              </div>
+            ) : (
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search miner by name..."
+                  className="w-full px-4 py-2 rounded-md bg-gray-800 border border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-white"
+                />
+                
+                {/* Dropdown for search results */}
+                {searchTerm && filteredMiners.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg max-h-60 overflow-auto">
+                    {filteredMiners.map((miner: Miner) => (
+                      <div
+                        key={miner.id}
+                        onClick={() => handleMinerSelect(miner)}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-800"
+                      >
+                        {miner.first_name + ' ' + miner.last_name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Selected Miner Info */}
